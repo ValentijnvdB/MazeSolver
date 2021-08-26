@@ -1,83 +1,66 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Solve a maze
+ *
+ * Black squares are walls, all other colors are walkable
+ *
+ * A valid maze is an image with Black pixels around the edge, and entrance at (1, 0) and
+ * exactly one exit at the bottom (not in the corners)
+ */
 public class MazeSolver {
 
-    int width;
-    int height;
-    BufferedImage image;
-
-    /**
-     * Default constructor using 400x400 image
-     */
-    public MazeSolver() {
-        this(400, 400);
-    }
-
-    /**
-     * Constructor using custom sized image
-     *
-     * @param width width of image
-     * @param height height of image
-     */
-    public MazeSolver(int width, int height) {
-        this.width = width;    //width of the image
-        this.height = height;   //height of the image
-        image = null;
-    }
+    Maze maze;
 
     /**
      * main method
      */
-    private void run() {
-        image = readImage();
-        if (image != null) {
+    private void run(int w, int h) {
+        try {
+            maze = readImage(w, h);
             writeImage();
+        }
+        catch(IOException e) {
+            System.out.println("Error: " + e);
         }
     }
 
     /**
      * read the image
      * @return image as BufferedImage
+     * @throws IOException something goes wrong
      */
-    private BufferedImage readImage() {
-        try {
-            File input_file = new File("C:\\Users\\20191697\\IdeaProjects\\MazeSolver\\src\\Images\\input.jpg"); //image file path
-            image = new BufferedImage(width, height,
-                    BufferedImage.TYPE_INT_ARGB);
-            image = ImageIO.read(input_file);
-            System.out.println("Reading complete.");
-            return image;
-        }
-        catch(IOException e) {
-            System.out.println("Error: " + e);
-            return null;
-        }
+    private Maze readImage(int w, int h) throws IOException {
+        File input_file = new File("C:\\Users\\20191697\\IdeaProjects\\MazeSolver\\src\\Images\\input.png"); //image file path
+        BufferedImage image = new BufferedImage(w, h,
+                BufferedImage.TYPE_INT_ARGB);
+        image = ImageIO.read(input_file);
+        maze = new Maze(image, w, h);
+        System.out.println("Reading complete.");
+        return maze;
     }
 
     /**
      * writes output image
+     * @throws IOException something goes wrong
      */
-    private void writeImage() {
-        try {
-            File output_file = new File("C:\\Users\\20191697\\IdeaProjects\\MazeSolver\\src\\Images\\output.jpg");
-            ImageIO.write(image, "jpg", output_file);
-            System.out.println("Writing complete.");
-        } catch (IOException e) {
-            System.out.println("Error: " + e);
-        }
+    private void writeImage() throws IOException {
+        File output_file = new File("C:\\Users\\20191697\\IdeaProjects\\MazeSolver\\src\\Images\\output.png");
+        ImageIO.write(maze.getImage(), "png", output_file);
+        System.out.println("Writing complete.");
     }
 
 
     public static void main(String[] args) {
+        int width = 20;
+        int height = 20;
+
         MazeSolver mazeSolver = new MazeSolver();
-        mazeSolver.run();
+        mazeSolver.run(width, height);
     }
-
-// WRITE IMAGE
-
-
 
 }
