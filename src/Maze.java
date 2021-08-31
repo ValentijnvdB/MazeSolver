@@ -133,6 +133,15 @@ public class Maze {
      */
     public void setNewStatus(int x, int y, int s) {
         mazeMatrix[x][y] = s;
+        int color;
+        if (s == 2) {
+            color = Color.RED.getRGB();
+            mazeImage.setRGB(x, y, color);
+        } else if (s == 3) {
+            color = Color.WHITE.getRGB();
+            mazeImage.setRGB(x, y, color);
+        }
+
     }
 
     /**

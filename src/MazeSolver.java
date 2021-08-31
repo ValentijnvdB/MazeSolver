@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -15,22 +16,29 @@ public class MazeSolver {
     Maze maze;
     Solver solver;
     IOSystem ioSystem;
+    JFrame frame;
+    MazePanel mp;
 
     /**
      * Main method
      * @param fileName the filename of the maze
      */
     private void run(String fileName) {
-        JFrame frame = new JFrame("Maze Solver");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+                frame = new JFrame("Maze Solver");
+                frame.setPreferredSize(new Dimension(400, 300));
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                mp = new MazePanel(null);
+                frame.add(mp);
+                frame.setVisible(true);
 
         try {
             ioSystem = new IOSystem();
             maze = ioSystem.readImage(fileName);
-            solver = new Solver(maze, ioSystem);
+            mp.updateImage(maze.getImage());
+            mp.repaint();
+            solver = new Solver(maze, ioSystem, mp);
             solver.execute();
-            System.out.println("Started execution");
         }
         catch(IOException e) {
             System.out.println("Error: " + e);
@@ -38,8 +46,12 @@ public class MazeSolver {
     }
 
 
+
+
+
+
     public static void main(String[] args) {
-        String fileName = "braid200.png";
+        String fileName = "braid2k.png";
 
         MazeSolver mazeSolver = new MazeSolver();
         mazeSolver.run(fileName);

@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Swingworker that solves the maze in the background
  */
@@ -15,22 +17,23 @@ public class Solver extends SwingWorker<Maze, Maze> {
     private boolean found;
     private ArrayList<int[]> path;
     IOSystem ioSystem;
+    MazePanel mazePanel;
 
     /**
      * Constructor
      * @param maze the maze to solve
      * @param ioSystem the input output system, used to print the maze when solved
      */
-    public Solver(Maze maze, IOSystem ioSystem) {
+    public Solver(Maze maze, IOSystem ioSystem, MazePanel mp) {
         this.maze = maze;
         this.exit = maze.getExit();
         this.path = new ArrayList<>();
         this.ioSystem = ioSystem;
+        this.mazePanel = mp;
     }
 
     @Override
-    protected Maze doInBackground() throws Exception {
-        System.out.println("doInBackground");
+    protected Maze doInBackground() {
         int[] start = maze.getStart();
         int x = start[0];
         int y = start[1];
@@ -44,12 +47,7 @@ public class Solver extends SwingWorker<Maze, Maze> {
         super.done();
         if (found) {
             BufferedImage img = maze.getImage();
-            int red = 255;
-            int color = (new Color(red, 0, 0)).getRGB();
-            for (int[] c: path) {
-                img.setRGB(c[0], c[1], color);
-                System.out.println(c[0] + ", " + c[1]);
-            }
+            mazePanel.repaint();
             try {
                 ioSystem.writeImage(maze);
             } catch (IOException e) {
@@ -71,7 +69,6 @@ public class Solver extends SwingWorker<Maze, Maze> {
 
         // Check left
         if (isValid(x-1, y)) {
-            System.out.println("Trying left");
             setNewStatus(x-1, y, 2);
             if (findNext(x-1, y)) {
                 return true;
@@ -81,7 +78,6 @@ public class Solver extends SwingWorker<Maze, Maze> {
 
         // Check right
         if (isValid(x+1, y)) {
-            System.out.println("Trying right");
             setNewStatus(x+1, y, 2);
             if (findNext(x+1, y)) {
                 return true;
@@ -91,7 +87,6 @@ public class Solver extends SwingWorker<Maze, Maze> {
 
         // Check down
         if (isValid(x, y-1)) {
-            System.out.println("Trying down");
             setNewStatus(x, y-1, 2);
             if (findNext(x, y-1)) {
                 return true;
@@ -101,7 +96,6 @@ public class Solver extends SwingWorker<Maze, Maze> {
 
         // Check up
         if (isValid(x, y+1)) {
-            System.out.println("Trying up");
             setNewStatus(x, y+1, 2);
             if (findNext(x, y+1)) {
                 return true;
@@ -130,12 +124,11 @@ public class Solver extends SwingWorker<Maze, Maze> {
      */
     private void setNewStatus(int x, int y, int s) {
         maze.setNewStatus(x, y, s);
+        mazePanel.repaint();
         if ( s==2 ) {
             path.add( new int[]{x, y} );
-            System.out.println("Added: (" + x + ", " + y + "), " + s);
         } else if ( s==3 ) {
             path.remove( path.size() - 1 );
-            System.out.println("Removed: (" + x + ", " + y + "), " + s);
         }
     }
 
